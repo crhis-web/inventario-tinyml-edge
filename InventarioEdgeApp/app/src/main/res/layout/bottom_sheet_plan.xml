@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#0D1117"
+    android:paddingBottom="24dp">
+
+    <!-- Handle -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="14dp"
+        android:background="#26FFFFFF" />
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="2dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_bulb"
+                app:tint="#00E5FF"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plan de Acción IA"
+                android:textColor="#E2E8F0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvEstadoGeneral"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CRÍTICO"
+                android:textColor="#F87171"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:background="#26EF4444"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSheetSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Resumen de sesión generado"
+            android:textColor="#59FFFFFF"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#0FFFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Content Area (To be populated dynamically or statically based on items) -->
+    <LinearLayout
+        android:id="@+id/llResumenItems"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:layout_marginBottom="16dp">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ANÁLISIS DE CATEGORÍAS"
+            android:textColor="#4DFFFFFF"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+            
+        <!-- Items will be added programmatically here -->
+    </LinearLayout>
+
+    <!-- Recomendaciones Fijas (Mockup) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:layout_marginBottom="14dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PASOS RECOMENDADOS"
+            android:textColor="#4DFFFFFF"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Step 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#08FFFFFF"
+            android:padding="10dp"
+            android:layout_marginBottom="7dp">
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#1E00E5FF"
+                android:text="1"
+                android:textColor="#00E5FF"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginEnd="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reubicar equipos para mitigar deficiencias."
+                android:textColor="#A6FFFFFF"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Step 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#08FFFFFF"
+            android:padding="10dp"
+            android:layout_marginBottom="7dp">
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#1E00E5FF"
+                android:text="2"
+                android:textColor="#00E5FF"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginEnd="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Emitir orden de compra para insumos faltantes según reporte."
+                android:textColor="#A6FFFFFF"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Acciones -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
+
+        <Button
+            android:id="@+id/btnExport"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cerrar y Guardar"
+            android:textColor="#00E5FF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:backgroundTint="#1A00E5FF"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btnNew"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Limpiar Sesión"
+            android:textColor="#99FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:backgroundTint="#0DFFFFFF" />
+    </LinearLayout>
+
+</LinearLayout>

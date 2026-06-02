@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EduTech Inventario IA</string>
+    <string name="latencia_default">Latencia: -- ms</string>
+    <string name="listo_para_escanear">Apunte la cámara al escritorio</string>
+    <string name="modo_avion_hint">Modo Avión: Procesamiento 100% Local</string>
+    <string name="confianza_default">Confianza: --%</string>
+    <string name="clase_default">Sin detección</string>
+</resources>
