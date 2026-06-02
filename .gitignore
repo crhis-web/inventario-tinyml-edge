@@ -1,0 +1,25 @@
+# Ignore datasets
+dataset/
+proyectos_separados/
+*.zip
+
+# Ignore heavy unquantized models
+modelos_exportados/*.h5
+modelos_exportados/*.pb
+modelos_exportados/variables/
+modelos_exportados/assets/
+
+# Keep the lightweight TFLite model for demonstration
+!modelos_exportados/*.tflite
+!modelos_exportados/labels.txt
+
+# Python ignores
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Jupyter ignores
+.ipynb_checkpoints/

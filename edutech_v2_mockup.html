@@ -1,0 +1,783 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .phone-shell {
+    width: 320px;
+    background: #0D1117;
+    border-radius: 36px;
+    overflow: hidden;
+    border: 1.5px solid #1f2937;
+    font-family: 'JetBrains Mono', monospace;
+    position: relative;
+    margin: 0 auto;
+    box-shadow: 0 0 0 6px #111827;
+  }
+
+  .screen {
+    position: relative;
+    height: 640px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .camera-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, #1a1f2e 0%, #0f1219 60%, #090c11 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .scene-placeholder {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .desk-sim {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(180deg, #1e2530 0%, #151a22 100%);
+    border-top: 1px solid #2a3040;
+  }
+
+  .keyboard-sim {
+    position: absolute;
+    bottom: 30%; left: 10%; width: 70%; height: 28%;
+    background: #1c1f2a;
+    border-radius: 6px;
+    border: 1px solid #2d3347;
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 2px;
+    padding: 6px 8px;
+  }
+
+  .key {
+    background: #252b38;
+    border-radius: 2px;
+    border: 0.5px solid #323a50;
+  }
+
+  .monitor-sim {
+    position: absolute;
+    top: 5%; left: 15%; width: 60%; height: 40%;
+    background: #0a0e14;
+    border: 2px solid #1d2535;
+    border-radius: 4px;
+  }
+  .monitor-sim::after {
+    content: '';
+    position: absolute;
+    bottom: -14px; left: 40%; width: 20%; height: 14px;
+    background: #1a1f2b;
+  }
+
+  .header-hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 10px 14px 12px;
+    background: rgba(13,17,23,0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,229,255,0.12);
+    z-index: 10;
+  }
+
+  .header-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: -0.5px;
+  }
+
+  .status-pill {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(0,229,255,0.08);
+    border: 0.5px solid rgba(0,229,255,0.25);
+    border-radius: 20px;
+    padding: 3px 8px;
+    font-size: 9px;
+    color: #00e5ff;
+    letter-spacing: 0.8px;
+  }
+
+  .status-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #00e5ff;
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .inventory-count {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #00e5ff;
+    margin-top: 2px;
+    letter-spacing: -1px;
+  }
+
+  .inventory-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .bbox {
+    position: absolute;
+    border: 1.5px solid #00e5ff;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .bbox-corner {
+    position: absolute;
+    width: 8px; height: 8px;
+  }
+  .bbox-corner.tl { top:-1px; left:-1px; border-top: 2.5px solid #00e5ff; border-left: 2.5px solid #00e5ff; }
+  .bbox-corner.tr { top:-1px; right:-1px; border-top: 2.5px solid #00e5ff; border-right: 2.5px solid #00e5ff; }
+  .bbox-corner.bl { bottom:-1px; left:-1px; border-bottom: 2.5px solid #00e5ff; border-left: 2.5px solid #00e5ff; }
+  .bbox-corner.br { bottom:-1px; right:-1px; border-bottom: 2.5px solid #00e5ff; border-right: 2.5px solid #00e5ff; }
+
+  .bbox-label {
+    position: absolute;
+    top: -18px; left: -1px;
+    background: #00e5ff;
+    color: #000;
+    font-size: 8px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 2px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  .bbox-confirm { border-color: #00E676; }
+  .bbox-confirm .bbox-corner.tl,.bbox-confirm .bbox-corner.tr,.bbox-confirm .bbox-corner.bl,.bbox-confirm .bbox-corner.br { border-color: #00E676; }
+  .bbox-confirm .bbox-label { background: #00E676; }
+
+  .progress-ring {
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 2px;
+    background: rgba(0,229,255,0.15);
+    overflow: hidden;
+    border-radius: 1px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #00e5ff;
+    width: 0%;
+    animation: fill-progress 1.8s ease-out 0.5s forwards;
+  }
+  @keyframes fill-progress {
+    to { width: 100%; }
+  }
+
+  .detection-card {
+    position: absolute;
+    bottom: 80px; left: 12px; right: 12px;
+    background: rgba(13,17,23,0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,229,255,0.18);
+    border-radius: 14px;
+    padding: 12px 14px;
+    z-index: 10;
+  }
+
+  .det-label {
+    font-size: 8px;
+    color: #00e5ff;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.7;
+  }
+
+  .det-main {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #e2e8f0;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .det-status {
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .metrics-row {
+    display: flex; gap: 8px;
+  }
+
+  .metric-chip {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 7px 10px;
+  }
+
+  .metric-label {
+    font-size: 8px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 4px;
+    margin-bottom: 3px;
+  }
+
+  .metric-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .metric-dot.cyan { background: #00e5ff; }
+  .metric-dot.green { background: #00E676; }
+
+  .metric-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .card-progress {
+    height: 2px;
+    background: rgba(0,229,255,0.12);
+    border-radius: 1px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .card-progress-fill {
+    height: 100%;
+    background: #00e5ff;
+    border-radius: 1px;
+  }
+
+  .fab {
+    position: absolute;
+    bottom: 18px; left: 12px; right: 12px;
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.35);
+    border-radius: 40px;
+    padding: 13px 20px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: #00e5ff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s;
+  }
+
+  .fab:hover {
+    background: rgba(0,229,255,0.18);
+  }
+
+  .fab i { font-size: 16px; }
+
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 0;
+    padding: 0 4px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 4px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.35);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tab-btn.active {
+    color: #00e5ff;
+    border-bottom-color: #00e5ff;
+  }
+
+  .sheet-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 20;
+    align-items: flex-end;
+  }
+  .sheet-overlay.show { display: flex; }
+
+  .bottom-sheet {
+    width: 100%;
+    background: #0D1117;
+    border-top: 1px solid rgba(0,229,255,0.2);
+    border-radius: 20px 20px 0 0;
+    padding: 0 0 20px;
+    max-height: 88%;
+    overflow-y: auto;
+  }
+
+  .sheet-handle {
+    width: 36px; height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin: 10px auto 14px;
+  }
+
+  .sheet-header {
+    padding: 0 16px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 12px;
+  }
+
+  .sheet-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #e2e8f0;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 2px;
+  }
+
+  .sheet-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.5px;
+  }
+
+  .status-badge {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .badge-warn { background: rgba(239,68,68,0.15); color: #f87171; border: 0.5px solid rgba(239,68,68,0.3); }
+  .badge-ok { background: rgba(0,230,118,0.12); color: #00E676; border: 0.5px solid rgba(0,230,118,0.25); }
+
+  .analysis-section {
+    padding: 0 16px;
+    margin-bottom: 12px;
+  }
+
+  .section-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    gap: 8px;
+  }
+
+  .item-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #cbd5e1;
+    flex: 1;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .item-count {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .item-bar {
+    width: 70px; height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .item-bar-fill { height: 100%; border-radius: 2px; }
+  .fill-warn { background: #ef4444; }
+  .fill-ok { background: #00E676; }
+  .fill-mid { background: #f59e0b; }
+
+  .steps-section {
+    padding: 0 16px;
+    margin-bottom: 14px;
+  }
+
+  .step-card {
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 7px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,229,255,0.12);
+    border: 0.5px solid rgba(0,229,255,0.3);
+    color: #00e5ff;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+  }
+
+  .action-row {
+    display: flex; gap: 8px;
+    padding: 0 16px;
+  }
+
+  .sheet-btn {
+    flex: 1;
+    padding: 11px 8px;
+    border-radius: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+  }
+
+  .btn-export {
+    background: rgba(0,229,255,0.1);
+    color: #00e5ff;
+    border: 1px solid rgba(0,229,255,0.3);
+  }
+
+  .btn-new {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+    border: 0.5px solid rgba(255,255,255,0.1);
+  }
+
+  .view-toggle {
+    display: flex; gap: 6px;
+    justify-content: center;
+    padding: 8px 0 14px;
+  }
+
+  .toggle-dot {
+    width: 20px; height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-dot.active { background: #00e5ff; width: 28px; }
+
+  .phase-nav {
+    display: flex; justify-content: center; gap: 8px;
+    padding: 0 12px 10px;
+    flex-wrap: wrap;
+  }
+
+  .phase-btn {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: 0.5px solid rgba(0,229,255,0.25);
+    color: rgba(255,255,255,0.4);
+    background: transparent;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.2s;
+  }
+  .phase-btn.active {
+    background: rgba(0,229,255,0.12);
+    color: #00e5ff;
+    border-color: rgba(0,229,255,0.4);
+  }
+
+  .screen-label {
+    text-align: center;
+    font-size: 9px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 0 2px;
+  }
+</style>
+
+<h2 class="sr-only">EduTech v2.0 mobile app mockup showing three interactive states: live detection with bounding boxes, object scanning, and the AI plan generation bottom sheet</h2>
+
+<div style="padding: 1rem 0; background: transparent;">
+  <div class="phone-shell">
+    <div style="height: 28px; background: #0D1117; display: flex; align-items: center; justify-content: space-between; padding: 0 18px;">
+      <span style="font-size: 10px; color: rgba(255,255,255,0.5); font-family:'JetBrains Mono',monospace;">8:39</span>
+      <div style="display: flex; gap: 4px; align-items: center;">
+        <span style="font-size: 8px; color: rgba(255,255,255,0.4); font-family:'JetBrains Mono',monospace;">5G</span>
+        <div style="width: 20px; height: 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 2px; padding: 1px; display: flex; align-items: center; gap: 1px;">
+          <div style="width: 60%; height: 100%; background: #00E676; border-radius: 1px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="main-screen" class="screen">
+      <div class="camera-bg">
+        <div class="scene-placeholder">
+          <div class="monitor-sim"></div>
+          <div class="desk-sim"></div>
+          <div class="keyboard-sim" id="kbd-sim">
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+          </div>
+          <div id="bbox-kbd" class="bbox bbox-confirm" style="left:8%;bottom:28%;width:72%;height:29%">
+            <div class="bbox-corner tl"></div><div class="bbox-corner tr"></div>
+            <div class="bbox-corner bl"></div><div class="bbox-corner br"></div>
+            <div class="bbox-label">TECLADO 98%</div>
+          </div>
+          <div id="bbox-mon" class="bbox" style="left:13%;top:8%;width:62%;height:40%">
+            <div class="bbox-corner tl"></div><div class="bbox-corner tr"></div>
+            <div class="bbox-corner bl"></div><div class="bbox-corner br"></div>
+            <div class="bbox-label">MONITOR 91%</div>
+            <div class="progress-ring"><div class="progress-fill" style="width:65%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-hud">
+        <div class="header-row">
+          <div>
+            <div class="brand">EduTech</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-top:1px;">SISTEMA DE INVENTARIO TINYML</div>
+          </div>
+          <div class="status-pill"><div class="status-dot"></div>EDGE AI · LOCAL</div>
+        </div>
+        <div style="margin-top:6px;">
+          <div class="inventory-label">Inventario Actual</div>
+          <div class="inventory-count" id="inv-count">8 objetos</div>
+        </div>
+      </div>
+
+      <div class="detection-card" id="det-card">
+        <div class="det-label">Detección en Tiempo Real</div>
+        <div class="det-main">
+          <i class="ti ti-circle-check" style="color:#00E676;font-size:18px" aria-hidden="true"></i>
+          <span id="det-obj">Teclado Mecánico</span>
+        </div>
+        <div class="det-status" id="det-status">¡REGISTRADO EN INVENTARIO!</div>
+        <div class="metrics-row">
+          <div class="metric-chip">
+            <div class="metric-label"><div class="metric-dot cyan"></div>LATENCIA</div>
+            <div class="metric-value" id="met-lat">35 ms</div>
+          </div>
+          <div class="metric-chip">
+            <div class="metric-label"><div class="metric-dot green"></div>CONFIANZA</div>
+            <div class="metric-value" id="met-conf">98%</div>
+          </div>
+        </div>
+        <div class="card-progress">
+          <div class="card-progress-fill" id="card-prog" style="width:100%;background:#00E676;"></div>
+        </div>
+      </div>
+
+      <div class="fab" id="fab-btn" onclick="openSheet()">
+        <i class="ti ti-device-floppy" aria-hidden="true"></i>
+        Finalizar y Generar Plan
+      </div>
+
+      <div class="sheet-overlay" id="sheet-overlay">
+        <div class="bottom-sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">
+              <i class="ti ti-bulb" style="color:#00e5ff;font-size:18px" aria-hidden="true"></i>
+              Plan de Acción IA
+              <span class="status-badge badge-warn">CRÍTICO</span>
+            </div>
+            <div class="sheet-sub">Estado del Laboratorio · 8 alumnos cubiertos de 10</div>
+          </div>
+
+          <div class="analysis-section">
+            <div class="section-label">Análisis de Requerimientos (Meta: 10 Alumnos)</div>
+            <div class="item-row">
+              <div class="item-name"><i class="ti ti-keyboard" style="font-size:14px;color:rgba(255,255,255,0.3)" aria-hidden="true"></i>Teclados</div>
+              <div class="item-count" style="color:#f87171;">7 / 10</div>
+              <div class="item-bar"><div class="item-bar-fill fill-warn" style="width:70%"></div></div>
+              <span class="status-badge badge-warn">-3</span>
+            </div>
+            <div class="item-row">
+              <div class="item-name"><i class="ti ti-device-desktop" style="font-size:14px;color:rgba(255,255,255,0.3)" aria-hidden="true"></i>Monitores</div>
+              <div class="item-count" style="color:#f59e0b;">5 / 10</div>
+              <div class="item-bar"><div class="item-bar-fill fill-mid" style="width:50%"></div></div>
+              <span class="status-badge" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:0.5px solid rgba(245,158,11,0.3);">-5</span>
+            </div>
+            <div class="item-row">
+              <div class="item-name"><i class="ti ti-mouse" style="font-size:14px;color:rgba(255,255,255,0.3)" aria-hidden="true"></i>Ratones</div>
+              <div class="item-count" style="color:#00E676;">10 / 10</div>
+              <div class="item-bar"><div class="item-bar-fill fill-ok" style="width:100%"></div></div>
+              <span class="status-badge badge-ok">OK</span>
+            </div>
+          </div>
+
+          <div class="steps-section">
+            <div class="section-label">Pasos Recomendados</div>
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-text">Reubicar 2 laptops de Sala B para mitigar la falta de monitores principales inmediatamente.</div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-text">Emitir orden de compra prioritaria para 3 teclados mecánicos estándar industriales.</div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-text">Solicitar 5 monitores adicionales al almacén central antes del próximo ciclo lectivo.</div>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="sheet-btn btn-export"><i class="ti ti-file-export" style="font-size:13px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>Exportar PDF</button>
+            <button class="sheet-btn btn-new" onclick="closeSheet()"><i class="ti ti-refresh" style="font-size:13px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>Iniciar Nuevo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-toggle" style="margin-top:14px;">
+    <div class="toggle-dot active" onclick="setView(0,this)"></div>
+    <div class="toggle-dot" onclick="setView(1,this)"></div>
+    <div class="toggle-dot" onclick="setView(2,this)"></div>
+  </div>
+
+  <div class="phase-nav" id="phase-nav">
+    <button class="phase-btn active" onclick="setScene('detected',this)">DETECTADO</button>
+    <button class="phase-btn" onclick="setScene('scanning',this)">ESCANEANDO</button>
+    <button class="phase-btn" onclick="setScene('plan',this)">PLAN IA</button>
+  </div>
+
+  <div class="screen-label" id="view-label">Vista 1 · Detección confirmada con bbox verde</div>
+</div>
+
+<script>
+function openSheet() {
+  document.getElementById('sheet-overlay').classList.add('show');
+}
+function closeSheet() {
+  document.getElementById('sheet-overlay').classList.remove('show');
+}
+
+const scenes = {
+  detected: {
+    bboxKbd: 'bbox-confirm', bboxMon: '',
+    detObj: 'Teclado Mecánico', detStatus: '¡REGISTRADO EN INVENTARIO!',
+    detIcon: 'ti-circle-check', detIconColor: '#00E676',
+    lat: '35 ms', conf: '98%',
+    prog: '100%', progColor: '#00E676',
+    inv: '8 objetos'
+  },
+  scanning: {
+    bboxKbd: '', bboxMon: 'bbox',
+    detObj: 'Monitor Detectado', detStatus: 'Mantenga la cámara fija...',
+    detIcon: 'ti-scan', detIconColor: '#00e5ff',
+    lat: '157 ms', conf: '96%',
+    prog: '65%', progColor: '#00e5ff',
+    inv: '7 objetos'
+  },
+  plan: {
+    bboxKbd: 'bbox-confirm', bboxMon: 'bbox-confirm',
+    detObj: 'Sesión Finalizada', detStatus: '10 objetos registrados · Procesando...',
+    detIcon: 'ti-check-all', detIconColor: '#00E676',
+    lat: '—', conf: '—',
+    prog: '100%', progColor: '#00E676',
+    inv: '10 objetos'
+  }
+};
+
+function setScene(key, btn) {
+  const s = scenes[key];
+  const bboxKbd = document.getElementById('bbox-kbd');
+  const bboxMon = document.getElementById('bbox-mon');
+  const detObj = document.getElementById('det-obj');
+  const detStatus = document.getElementById('det-status');
+  const detIconEl = document.querySelector('.det-main i');
+  const metLat = document.getElementById('met-lat');
+  const metConf = document.getElementById('met-conf');
+  const cardProg = document.getElementById('card-prog');
+  const invCount = document.getElementById('inv-count');
+
+  bboxKbd.className = 'bbox ' + s.bboxKbd;
+  bboxMon.className = 'bbox ' + s.bboxMon;
+  detObj.textContent = s.detObj;
+  detStatus.textContent = s.detStatus;
+  detIconEl.className = 'ti ' + s.detIcon;
+  detIconEl.style.color = s.detIconColor;
+  metLat.textContent = s.lat;
+  metConf.textContent = s.conf;
+  cardProg.style.width = s.prog;
+  cardProg.style.background = s.progColor;
+  invCount.textContent = s.inv;
+
+  if (key === 'plan') {
+    setTimeout(() => openSheet(), 300);
+  }
+
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function setView(idx, dot) {
+  document.querySelectorAll('.toggle-dot').forEach((d,i) => {
+    d.classList.toggle('active', i === idx);
+  });
+  const labels = [
+    'Vista 1 · Detección confirmada con bbox verde',
+    'Vista 2 · Escaneo activo con progreso cyan',
+    'Vista 3 · Plan IA generado'
+  ];
+  document.getElementById('view-label').textContent = labels[idx];
+  const sceneKeys = ['detected','scanning','plan'];
+  setScene(sceneKeys[idx], document.querySelectorAll('.phase-btn')[idx]);
+}
+</script>

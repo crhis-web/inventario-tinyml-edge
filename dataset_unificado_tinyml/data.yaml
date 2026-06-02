@@ -1,0 +1,5 @@
+train: C:\Users\Alumno\Desktop\inventario_tinyml_training\dataset_unificado_tinyml/train/images
+val: C:\Users\Alumno\Desktop\inventario_tinyml_training\dataset_unificado_tinyml/valid/images
+
+nc: 3
+names: ['objeto_tecnologico', 'util_escritorio', 'mesa_vacia']

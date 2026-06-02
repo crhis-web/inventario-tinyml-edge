@@ -48,6 +48,16 @@ Debido a que el modelo base trabaja con números decimales de alta precisión (`
 
 ---
 
-## 5. Conclusiones
+## 5. Arquitectura de Software y Diseño de Interfaz (UI/UX v2)
 
-La integración de **Edge Computing** demostró ser completamente superior al paradigma de computación en la nube para aplicaciones de inventario en tiempo real. Al procesar las imágenes en la fuente (el celular), hemos conseguido una aplicación robusta, veloz y completamente inmune a fallos de internet. La creación de un dataset curado de forma local eliminó los sesgos iniciales, permitiendo al sistema ser de utilidad real para la institución.
+Para garantizar que el modelo matemático fuera útil para el usuario final, se construyó una aplicación nativa robusta con arquitectura reactiva:
+
+1. **Gestión de Memoria y Base de Datos (Room SQLite):** Para evitar desbordamientos de memoria RAM al procesar listas gigantescas, se delegó la agrupación semántica al motor de base de datos a nivel de disco físico. Mediante consultas SQL `GROUP BY`, el celular es capaz de consolidar miles de registros en milisegundos sin latencia visual. El uso de **WAL (Write-Ahead Logging)** previene bloqueos de cámara durante la escritura.
+2. **Debouncing y Retroalimentación Hardware:** La cámara inyecta 30 fotogramas por segundo, lo cual generaría falsos positivos. Para evitarlo, se implementó un mecanismo de *Debouncing* multihilo (protegido con cerrojos `synchronized`) que exige 10 fotogramas continuos de confirmación. Visualmente esto se apoya con una barra de progreso animada (Feedback instantáneo) y acústicamente con el generador de tonos del sistema de Android (`ToneGenerator`) que emite un bip de confirmación al registrar el objeto, solucionando el problema de la "Ceguera del Operador".
+3. **UI Glassmorphism y Plan de Acción IA:** El diseño clásico fue reemplazado por componentes visuales *Premium*. Al finalizar el escaneo, en lugar de un cuadro de texto plano, la aplicación despliega dinámicamente un **Bottom Sheet Dialog** que expone el conteo categorizado e inyecta "Pasos Recomendados" (ej. reubicación o compra de equipos faltantes).
+
+---
+
+## 6. Conclusiones
+
+La integración de **Edge Computing** demostró ser completamente superior al paradigma de computación en la nube para aplicaciones de inventario en tiempo real. Al procesar las imágenes en la fuente (el celular), hemos conseguido una aplicación robusta, veloz y completamente inmune a fallos de internet. La creación de un dataset curado localmente y el envoltorio arquitectónico de Android (Base de Datos Reactiva, Feedback Háptico y UI Empresarial) transformaron un modelo matemático en un producto final de alta utilidad para la institución.

@@ -14,7 +14,10 @@ El laboratorio de cómputo sufre pérdidas de periféricos (mouse, calculadoras,
 1. **Modelo Base:** MobileNetV2 pre-entrenado en ImageNet.
 2. **Transfer Learning:** Extracción de características acopladas a una nueva capa densa de 3 clases (`Tecnología`, `Útiles`, `Mesa Vacía`).
 3. **Optimización:** Cuantización Entera Completa (Full Integer Quantization) a 8-bits (`INT8`) para compatibilidad extrema con dispositivos móviles antiguos.
-4. **Despliegue:** Exportación a `.tflite` para la app de Android escrita en Java nativo.
+4. **App Android (Java Nativo):** Despliegue mediante `.tflite` en una aplicación Android con arquitectura robusta.
+   - **Motor SQLite Integrado (Room):** Agrupación reactiva en tiempo real y protección contra colapsos de RAM.
+   - **UI/UX Premium:** Interfaz oscura (Glassmorphism), animaciones y sistema de Bottom Sheet para planes de acción de inteligencia artificial.
+   - **Feedback Hardware:** Escaneo protegido con debouncing algorítmico y aviso sonoro (`ToneGenerator`) nativo.
 
 ## 📊 Métricas de Compresión y Rendimiento
 
