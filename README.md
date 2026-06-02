@@ -17,7 +17,7 @@ El laboratorio de cómputo sufre pérdidas de periféricos (mouse, calculadoras,
 4. **App Android (Java Nativo):** Despliegue mediante `.tflite` en una aplicación Android con arquitectura robusta.
    - **Motor SQLite Integrado (Room):** Agrupación reactiva en tiempo real y protección contra colapsos de RAM.
    - **UI/UX Premium:** Interfaz oscura (Glassmorphism), animaciones y sistema de Bottom Sheet para planes de acción de inteligencia artificial.
-   - **Feedback Hardware:** Escaneo protegido con debouncing algorítmico y aviso sonoro (`ToneGenerator`) nativo.
+   - **Feedback Hardware:** Interfaz protegida por algoritmo de debouncing y **captura manual** con aviso sonoro (`ToneGenerator`) para otorgar control total al usuario.
 
 ## 📊 Métricas de Compresión y Rendimiento
 
