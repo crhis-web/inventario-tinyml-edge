@@ -35,12 +35,8 @@ public class ScanViewModel extends ViewModel {
         return repository.getAllSessions();
     }
 
-    private enum Estado { BUSCANDO, ENFRIAMIENTO }
-    private Estado currentState = Estado.BUSCANDO;
-
     private String currentCandidate = null;
     private int candidateCount = 0;
-    private int emptyCount = 0;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Object lock = new Object();
@@ -76,20 +72,6 @@ public class ScanViewModel extends ViewModel {
         inferenceConfidence.postValue(String.format(Locale.US, "%.0f%%", confidence * 100));
 
         synchronized (lock) {
-            if (currentState == Estado.ENFRIAMIENTO) {
-                if ("clase3_vacio".equals(className)) {
-                    emptyCount++;
-                    if (emptyCount >= 15) {
-                        currentState = Estado.BUSCANDO;
-                        uiClase.postValue("Entorno Vacío");
-                        uiMessage.postValue("Mesa libre. Listo para siguiente objeto.");
-                    }
-                } else {
-                    emptyCount = 0;
-                }
-                return;
-            }
-
             if (confidence < 0.60f) {
                 uiClase.postValue("Analizando...");
                 uiMessage.postValue("Confianza insuficiente, ajuste el ángulo");
@@ -98,12 +80,15 @@ public class ScanViewModel extends ViewModel {
 
             if (!"clase3_vacio".equals(className)) {
                 if (className.equals(currentCandidate)) {
-                    candidateCount++;
-                    detectionProgress.postValue(candidateCount * 10);
+                    if (candidateCount < 10) {
+                        candidateCount++;
+                        detectionProgress.postValue(candidateCount * 10);
+                    }
                     uiClase.postValue(getClassIcon(className) + " " + getReadableName(className));
-                    uiMessage.postValue("Verificando: " + candidateCount + " de 10 muestras confirmadas");
                     if (candidateCount >= 10) {
-                        registrarDeteccion(className, confidence);
+                        uiMessage.postValue("Listo. Presione el botón CAPTURAR.");
+                    } else {
+                        uiMessage.postValue("Verificando: " + candidateCount + " de 10 muestras confirmadas");
                     }
                 } else {
                     currentCandidate = className;
@@ -122,33 +107,25 @@ public class ScanViewModel extends ViewModel {
         }
     }
 
-    private void registrarDeteccion(String className, float confidence) {
-        currentState = Estado.ENFRIAMIENTO;
-        currentCandidate = null;
-        candidateCount = 0;
-        emptyCount = 0;
-        detectionProgress.postValue(100);
-
-        uiClase.postValue("✅ " + getReadableName(className));
-        uiMessage.postValue("¡REGISTRADO EN INVENTARIO!");
-        repository.addDetection(className, confidence);
-
-        // Retroalimentación auditiva
-        try {
-            ToneGenerator toneGen = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-            toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 150);
-        } catch (Exception e) {
-            // Silently ignore if ToneGenerator fails
-        }
-
-        scheduler.schedule(() -> {
-            synchronized (lock) {
-                if (currentState == Estado.ENFRIAMIENTO) {
-                    currentState = Estado.BUSCANDO;
-                    uiMessage.postValue("Apunte al siguiente objeto o escritorio.");
+    public void registrarCapturaManual() {
+        synchronized (lock) {
+            if (currentCandidate != null && candidateCount >= 5) {
+                repository.addDetection(currentCandidate, 0.99f);
+                uiMessage.postValue("¡CAPTURADO MANUAMENTE!");
+                
+                // Retroalimentación auditiva
+                try {
+                    ToneGenerator toneGen = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+                    toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 150);
+                } catch (Exception e) {
+                    // Ignorar
                 }
+                
+                // Reiniciar contador de UI temporalmente para efecto visual
+                candidateCount = 0;
+                detectionProgress.postValue(0);
             }
-        }, 4, TimeUnit.SECONDS);
+        }
     }
 
     @Override

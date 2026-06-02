@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
+        binding.fabCapturar.setOnClickListener(v -> {
+            viewModel.registrarCapturaManual();
+        });
+
         Executors.newSingleThreadExecutor().execute(() -> {
             analyzer = new TFLiteAnalyzer(getApplicationContext(), (className, confidence, time) ->
                     viewModel.processDetection(className, confidence, time));
